@@ -1,0 +1,2 @@
+acceptance reviews.hurl
+e2e grading a due card removes it from the queue

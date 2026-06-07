@@ -1,0 +1,293 @@
+openapi: 3.1.0
+info:
+  title: Recall API
+  version: 0.1.0
+  description: |
+    Personal knowledge base with spaced repetition.
+    Capture notes, tag and link them, turn notes into cards, review on a
+    daily queue, track simple stats.
+
+    This contract is the floor: the acceptance suite (spec/acceptance/*.hurl)
+    asserts the observable behaviour described here. It is deliberately loose.
+    The exact scheduling interval table and the precise stats definitions are
+    NOT pinned in this contract — that is part of the task.
+servers:
+  - url: http://localhost:8080
+    description: Local backend (php -S / compose)
+
+tags:
+  - name: notes
+  - name: cards
+  - name: reviews
+  - name: stats
+
+paths:
+  /notes:
+    get:
+      tags: [notes]
+      summary: List notes, optionally filtered by tag
+      parameters:
+        - name: tag
+          in: query
+          required: false
+          schema: { type: string }
+          description: Return only notes carrying this tag.
+      responses:
+        "200":
+          description: List of notes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Note" }
+    post:
+      tags: [notes]
+      summary: Create a note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NoteInput" }
+      responses:
+        "201":
+          description: Created note
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Note" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /notes/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [notes]
+      summary: Get a note
+      responses:
+        "200":
+          description: Note
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Note" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [notes]
+      summary: Update a note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NoteInput" }
+      responses:
+        "200":
+          description: Updated note
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Note" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+    delete:
+      tags: [notes]
+      summary: Delete a note
+      responses:
+        "204": { description: Deleted }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /cards:
+    get:
+      tags: [cards]
+      summary: List cards
+      responses:
+        "200":
+          description: List of cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Card" }
+    post:
+      tags: [cards]
+      summary: Create a card from a note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CardInput" }
+      responses:
+        "201":
+          description: Created card
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Card" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /cards/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [cards]
+      summary: Get a card
+      responses:
+        "200":
+          description: Card
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Card" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [cards]
+      summary: Delete a card
+      responses:
+        "204": { description: Deleted }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /reviews/queue:
+    get:
+      tags: [reviews]
+      summary: Cards due for review now
+      responses:
+        "200":
+          description: Due cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Card" }
+
+  /reviews/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    post:
+      tags: [reviews]
+      summary: Grade a card and schedule the next review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [grade]
+              properties:
+                grade:
+                  type: string
+                  enum: [again, hard, good, easy]
+      responses:
+        "201":
+          description: Recorded review
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Review" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /stats:
+    get:
+      tags: [stats]
+      summary: Review stats
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Stats" }
+
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ValidationError:
+      description: Invalid input
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Note:
+      type: object
+      required: [id, title, body, tags, links, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        body: { type: string }
+        tags:
+          type: array
+          items: { type: string }
+        links:
+          type: array
+          description: Ids of linked notes.
+          items: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    NoteInput:
+      type: object
+      required: [title, body]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        body: { type: string, maxLength: 20000 }
+        tags:
+          type: array
+          items: { type: string }
+        links:
+          type: array
+          items: { type: string, format: uuid }
+
+    Card:
+      type: object
+      required: [id, note_id, front, back, ease, interval, due, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        note_id: { type: string, format: uuid }
+        front: { type: string }
+        back: { type: string }
+        ease: { type: number }
+        interval: { type: integer, description: Days until next review. }
+        due: { type: string, format: date }
+        created_at: { type: string, format: date-time }
+
+    CardInput:
+      type: object
+      required: [note_id, front, back]
+      properties:
+        note_id: { type: string, format: uuid }
+        front: { type: string, minLength: 1, maxLength: 4000 }
+        back: { type: string, minLength: 1, maxLength: 4000 }
+
+    Review:
+      type: object
+      required: [id, card_id, grade, interval, ease, next_due, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        card_id: { type: string, format: uuid }
+        grade: { type: string, enum: [again, hard, good, easy] }
+        interval: { type: integer }
+        ease: { type: number }
+        next_due: { type: string, format: date }
+        created_at: { type: string, format: date-time }
+
+    Stats:
+      type: object
+      required: [due_today, due_week, streak]
+      properties:
+        due_today: { type: integer }
+        due_week: { type: integer }
+        streak: { type: integer }
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
+        details:
+          type: object
+          additionalProperties: true

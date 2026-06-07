@@ -1,0 +1,34 @@
+# Dependencies
+/app/backend/vendor/
+/app/frontend/node_modules/
+/e2e/node_modules/
+
+# Build output
+/app/frontend/dist/
+/www/public/
+/www/.tola/
+
+# Runtime data
+/app/backend/var/
+*.sqlite
+
+# Static-analysis caches
+/app/backend/.php-cs-fixer.cache
+
+# Playwright
+/e2e/test-results/
+/e2e/playwright-report/
+
+# Local config (copy from .env.example)
+/.env
+
+# Devbox / direnv
+/.devbox/
+
+# Editors / OS
+/.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+var/

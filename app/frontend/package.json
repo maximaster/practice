@@ -1,0 +1,28 @@
+{
+  "name": "recall-frontend",
+  "description": "Recall — фронтенд (TypeScript + Vite)",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview --port 5173",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.60.1",
+    "vite": "^6.0.0",
+    "vitest": "^4.1.8"
+  }
+}

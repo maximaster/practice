@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
+  "packages": [
+    "php@8.5",
+    "nodejs@22",
+    "hurl@latest",
+    "just@latest",
+    "typst@latest",
+    "parallel@latest",
+    "github:tola-rs/tola-ssg/v0.7.1",
+    "github:mlavrinenko/linecop/v0.3.0",
+    "github:mlavrinenko/outdatty/v0.1.0"
+  ]
+}

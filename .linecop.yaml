@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mlavrinenko/linecop/refs/tags/v0.3.0/linecop-schema.json
+
+# Count every line (code + comments + blanks).
+count_mode: total
+
+# Directory names skipped entirely.
+exclude_dirs:
+  - target
+  - vendor
+  - node_modules
+  - public
+  - dist
+  - .devbox
+  - .tola
+  - .git
+
+# Per-language line limits. Languages not listed are unlimited
+# (lockfiles, OpenAPI YAML, generated Tola helpers, etc.).
+limits:
+  PHP: 250
+  TypeScript: 250
+  CSS: 300
+  Markdown: 400
+
+overrides:
+  # LOGBOOK.md is capped at 80 lines — this is the actual requirement we ask
+  # candidates to meet, enforced here so `just lint` checks it.
+  - pattern: "LOGBOOK.md"
+    limit: 80

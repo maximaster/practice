@@ -1,0 +1,48 @@
+name: pages
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.13.0
+
+      - name: Build guide (Typst + Tola)
+        run: |
+          eval "$(devbox shellenv)"
+          just guide
+          # Tola nests output under the url prefix; that subdir is the site root
+          # for the project page. Drop the auto CNAME (not a custom domain).
+          rm -f www/public/practice/CNAME
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: www/public/practice
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

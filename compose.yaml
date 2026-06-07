@@ -1,0 +1,53 @@
+# Recall — local app stack: backend (PHP) + frontend (Vite).
+# Storage is SQLite, embedded in the backend (a single-user tool needs no DB server).
+#
+# Зависимости живут в именованных томах (backend_vendor / frontend_node_modules),
+# а не в bind-mount: контейнерный `composer install --no-dev` / `npm install`
+# не затирает локальные dev-инструменты и не оставляет на хосте файлы от root.
+
+services:
+  # One-shot: install backend dependencies into the named volume before the server starts.
+  backend-deps:
+    image: composer:2
+    working_dir: /app
+    volumes:
+      - ./app/backend:/app
+      - backend_vendor:/app/vendor
+    command: composer install --no-dev --no-interaction --ignore-platform-reqs
+
+  backend:
+    image: php:8.5-cli
+    working_dir: /app
+    # Constrained to mimic the client's small server (see README "Производительность").
+    # Limits come from .env.example (single source; the guide renders them too).
+    command: php -d memory_limit=${RECALL_PHP_MEMORY_LIMIT:-96M} -S 0.0.0.0:8080 -t public public/index.php
+    environment:
+      # Ephemeral DB inside the container: a fresh, seeded database on every `up`.
+      RECALL_DB: /tmp/recall.sqlite
+    volumes:
+      - ./app/backend:/app
+      - backend_vendor:/app/vendor
+    ports:
+      - "${RECALL_BACKEND_PORT}:8080"
+    mem_limit: ${RECALL_CONTAINER_MEMORY_LIMIT:-256M}
+    depends_on:
+      backend-deps:
+        condition: service_completed_successfully
+
+  frontend:
+    image: node:22
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    environment:
+      VITE_API_BASE: http://localhost:${RECALL_BACKEND_PORT}
+    volumes:
+      - ./app/frontend:/app
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - "${RECALL_FRONTEND_PORT}:5173"
+    depends_on:
+      - backend
+
+volumes:
+  backend_vendor:
+  frontend_node_modules:

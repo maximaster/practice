@@ -1,0 +1,3 @@
+[submodule "www/content/review"]
+	path = www/content/review
+	url = git@gitlab.maximaster.ru:maximaster/practice/practice-extras.git

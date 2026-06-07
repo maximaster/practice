@@ -1,0 +1,28 @@
+name: docs-sync
+
+# Maintainer-side gate: fail if a source artifact changed without the guide
+# pages that describe it being re-confirmed (`outdatty update`). NOT part of
+# `just verify` — candidates fork and change sources, and must not be gated by
+# our guide's lockfile. The repository guard keeps this a no-op in forks.
+#
+# PR-time drift detection only; master is covered by the full preflight gate
+# (preflight.yml), which runs `outdatty check` too.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  outdatty:
+    if: github.repository == 'maximaster/practice'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.13.0
+
+      - name: outdatty check
+        run: |
+          eval "$(devbox shellenv)"
+          outdatty check

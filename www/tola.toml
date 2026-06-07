@@ -1,0 +1,51 @@
+# Tola configuration (v0.7.1) — Recall guide site.
+
+[site.info]
+title = "Recall — практика"
+author = "maximaster"
+description = "Задание для практики: персональная база знаний с интервальным повторением."
+url = "https://maximaster.github.io/practice"
+language = "ru"
+
+[site.seo]
+auto_og = false
+
+[site.seo.feed]
+enable = false
+
+[site.seo.sitemap]
+enable = false
+
+[site.header]
+no_fouc = true
+styles = []
+scripts = []
+elements = []
+
+[build]
+content = "content"
+output = "public"
+minify = true
+deps = ["templates", "utils"]
+
+[build.assets]
+nested = ["assets"]
+flatten = []
+
+[build.hooks.css]
+enable = false
+
+[serve]
+interface = "127.0.0.1"
+port = 5277
+watch = true
+# Serve under the same /practice prefix the build uses, so local links resolve.
+respect_prefix = true
+
+[validate.pages]
+enable = true
+level = "error"
+
+[validate.assets]
+enable = true
+level = "error"

@@ -1,0 +1,39 @@
+name: preflight
+
+# Гейт веб-студии: на master проверяем, ЗДОРОВ ли шаблон для выдачи студентам —
+# гигиена + lint + юнит + гайд + outdatty + acceptance/e2e, сверенные с базлайном
+# известных «красных» (`just preflight`). Решённость как таковую не гейтим (это
+# `just verify` на ветках/PR, ci.yml; шаблон намеренно её не проходит). Guard
+# держит это no-op в форках.
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+
+jobs:
+  preflight:
+    if: github.repository == 'maximaster/practice'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.13.0
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('e2e/package-lock.json') }}
+
+      - name: Install Playwright browser + system deps
+        run: |
+          cd e2e
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: just preflight
+        run: |
+          eval "$(devbox shellenv)"
+          just preflight

@@ -1,0 +1,34 @@
+{
+    "name": "recall/backend",
+    "description": "Recall — personal knowledge base with spaced repetition (backend)",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "8.5.*",
+        "ext-json": "*",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
+        "cycle/annotated": "^4.5",
+        "cycle/orm": "^2.17",
+        "slim/psr7": "^1.8",
+        "slim/slim": "4.15.2",
+        "symfony/uid": "^8.1"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpmd/phpmd": "^2.15",
+        "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "rector/rector": "^2.4",
+        "testo/testo": "^0.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Recall\\": "src/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

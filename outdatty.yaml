@@ -1,0 +1,74 @@
+# Doc-sync tripwires: when a source artifact changes, outdatty fails until the
+# guide pages that describe it are re-confirmed (`outdatty update` re-signs the
+# blake3 lockfile). Hash-based; runs no commands.
+#
+# Maintainer-side only — wired into .github/workflows/docs-sync.yml with a
+# repository guard, NOT into `just verify`. Candidates fork and change sources
+# as part of the task; they must never be gated by our guide's lockfile.
+#
+# Values quoted verbatim in the guide (memory limits, PHP/Slim versions, the
+# LOGBOOK line cap) are NOT tripwired here — they are rendered live via Typst
+# data-loading (www/utils/env.typ, www/utils/repo.typ) and cannot drift. These
+# groups guard the prose, structure and behaviour that data-loading can't.
+
+groups:
+  - name: commands
+    # Recipe names quoted in the guide's run flow and command list.
+    source: [Justfile]
+    dependents:
+      - www/content/index.typ
+      - www/content/task.typ
+
+  - name: repo-layout
+    # The "Структура репозитория" tree and the run flow.
+    source: [compose.yaml, Justfile, devbox.json]
+    dependents:
+      - www/content/task.typ
+
+  - name: backend-stack
+    # Slim/Cycle/SQLite/UUIDv7 prose + the static stack line in the repo tree.
+    source: [app/backend/composer.json, compose.yaml]
+    dependents:
+      - www/content/stack.typ
+      - www/content/task.typ
+
+  - name: frontend-stack
+    # "TypeScript + Vite" claims.
+    source: [app/frontend/package.json]
+    dependents:
+      - www/content/stack.typ
+      - www/content/task.typ
+
+  - name: static-analysis
+    # PHPStan max+strict / PHPMD / Rector / ESLint type-aware / Prettier claims.
+    source:
+      - app/backend/phpstan.dist.neon
+      - app/backend/phpmd.xml
+      - app/backend/rector.php
+      - app/frontend/eslint.config.js
+      - app/frontend/tsconfig.json
+    dependents:
+      - www/content/stack.typ
+
+  - name: domain-model
+    # Entities + the again/hard/good/easy grade scale shown in guide/glossary.
+    source:
+      - app/backend/src/Domain/Note.php
+      - app/backend/src/Domain/Card.php
+      - app/backend/src/Domain/Grade.php
+    dependents:
+      - www/content/task.typ
+      - www/utils/glossary.typ
+
+  - name: api-surface
+    # "Что уже есть" feature list + OpenAPI-as-source-of-truth claim.
+    source: [spec/api/openapi.yaml]
+    dependents:
+      - www/content/task.typ
+      - www/utils/glossary.typ
+
+  - name: logbook-cap
+    # index.typ renders the cap live; the repo tree in task.typ still states it.
+    source: [.linecop.yaml]
+    dependents:
+      - www/content/task.typ

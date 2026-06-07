@@ -1,0 +1,57 @@
+version: 1
+algorithm: blake3
+groups:
+  api-surface:
+    source:
+      spec/api/openapi.yaml: ab9c8ba2dbd1cd1a692a5e4bd62e5e4c71a076c08be9ef5a8316f7e068fe637e
+    dependents:
+      www/content/task.typ: ebf6e0b273d849e2cf1a276ed5502ed8b9c2f8bb05f814d8e83e653087f2521d
+      www/utils/glossary.typ: 26c7e80019b4f737ee8f359fab52f268018a370051c8c86818b156e558c05892
+  backend-stack:
+    source:
+      app/backend/composer.json: affae8dc08e919c50426844bbdd6b4ab76797d4e7957e210c445ff4a670ccdc0
+      compose.yaml: 620a520be1cafed7b84e3a3de3cc79189cdba0e972d8e5f53db51a097a34b285
+    dependents:
+      www/content/stack.typ: 8ed4066fd5b324331297dd50a3b88fafe76668342af0c974808aefd01a009031
+      www/content/task.typ: ebf6e0b273d849e2cf1a276ed5502ed8b9c2f8bb05f814d8e83e653087f2521d
+  commands:
+    source:
+      Justfile: df575f0cf27445d39a1e1c41cfefcb131ce34f71f26ae1b1529651185454a6ee
+    dependents:
+      www/content/index.typ: 8cd9d3668f05e8e02ec0008b8b280df43d07e058c1c5a91abdf9b78a19033210
+      www/content/task.typ: ebf6e0b273d849e2cf1a276ed5502ed8b9c2f8bb05f814d8e83e653087f2521d
+  domain-model:
+    source:
+      app/backend/src/Domain/Card.php: e0677882247a9f8df2aa5d221e0993eb5fbf549e437a66cecacc13ed19fdcf82
+      app/backend/src/Domain/Grade.php: ef3238e498d5c52d921ac4c953034db833f085d64cbc170932d5b96eeb95f68a
+      app/backend/src/Domain/Note.php: 7fe1af898b3fb83f065e18b588834a5cb4a5821d4066a1d33d41d5a93fa34d48
+    dependents:
+      www/content/task.typ: ebf6e0b273d849e2cf1a276ed5502ed8b9c2f8bb05f814d8e83e653087f2521d
+      www/utils/glossary.typ: 26c7e80019b4f737ee8f359fab52f268018a370051c8c86818b156e558c05892
+  frontend-stack:
+    source:
+      app/frontend/package.json: bc17e2cc52e9a2eb4c4ffcf6c160cd2b5551f3fa8a1d275baba26a4f694eb387
+    dependents:
+      www/content/stack.typ: 8ed4066fd5b324331297dd50a3b88fafe76668342af0c974808aefd01a009031
+      www/content/task.typ: ebf6e0b273d849e2cf1a276ed5502ed8b9c2f8bb05f814d8e83e653087f2521d
+  logbook-cap:
+    source:
+      .linecop.yaml: 2827b8330d9cfcf6b999e9760b3a49002ee8326e9457325cabac417512c8a1ec
+    dependents:
+      www/content/task.typ: ebf6e0b273d849e2cf1a276ed5502ed8b9c2f8bb05f814d8e83e653087f2521d
+  repo-layout:
+    source:
+      Justfile: df575f0cf27445d39a1e1c41cfefcb131ce34f71f26ae1b1529651185454a6ee
+      compose.yaml: 620a520be1cafed7b84e3a3de3cc79189cdba0e972d8e5f53db51a097a34b285
+      devbox.json: 66bbcef55a4654318df272586c8b12ed0d79e3b70242dd25af77e22cff3e1c13
+    dependents:
+      www/content/task.typ: ebf6e0b273d849e2cf1a276ed5502ed8b9c2f8bb05f814d8e83e653087f2521d
+  static-analysis:
+    source:
+      app/backend/phpmd.xml: 2817595c64656aeef87c4299d713bc9ab04201876fadce534c63687285b54b96
+      app/backend/phpstan.dist.neon: 81f53777902b546a4f6415321d275b19340e524dcd1ac7b521842628e0ee0386
+      app/backend/rector.php: 410098cdf2d0b5a96d1be441b17e9e699f716a842be2cd95e6ea6dc239ae7f67
+      app/frontend/eslint.config.js: f4be9f9cccbe6c4010c349bb58c9023121bfa90df72b6607ad325b615eff6715
+      app/frontend/tsconfig.json: b54cdbd4eb3b9b84ca004ba260a80fb25f22128c20db85f4640a97479e4b927c
+    dependents:
+      www/content/stack.typ: 8ed4066fd5b324331297dd50a3b88fafe76668342af0c974808aefd01a009031

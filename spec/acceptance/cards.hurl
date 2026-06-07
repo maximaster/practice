@@ -1,0 +1,52 @@
+# Cards: created from a note, then read and listed.
+
+# A card needs a note.
+POST {{base}}/notes
+Content-Type: application/json
+{
+  "title": "Capital of France",
+  "body": "Paris."
+}
+HTTP 201
+[Captures]
+note_id: jsonpath "$.id"
+
+# Create a card from that note.
+POST {{base}}/cards
+Content-Type: application/json
+{
+  "note_id": "{{note_id}}",
+  "front": "Capital of France?",
+  "back": "Paris"
+}
+HTTP 201
+[Captures]
+card_id: jsonpath "$.id"
+[Asserts]
+jsonpath "$.note_id" == {{note_id}}
+jsonpath "$.front" == "Capital of France?"
+jsonpath "$.interval" isInteger
+jsonpath "$.due" matches /^\d{4}-\d{2}-\d{2}$/
+
+# Read it back.
+GET {{base}}/cards/{{card_id}}
+HTTP 200
+[Asserts]
+jsonpath "$.back" == "Paris"
+
+# It shows up in the list.
+GET {{base}}/cards
+HTTP 200
+[Asserts]
+jsonpath "$" isCollection
+jsonpath "$[*].id" contains {{card_id}}
+
+# A card needs an existing note.
+POST {{base}}/cards
+Content-Type: application/json
+{
+  "note_id": 999999,
+  "front": "x",
+  "back": "y"
+}
+HTTP 404
