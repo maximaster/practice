@@ -1,12 +1,33 @@
 // Page chrome: head, header nav, main, footer.
 
 #import "../utils/site.typ": SITE, NAV, u
+#import "../utils/tola.typ": og-tags
 
 #let make-head(m) = {
   html.elem("meta", attrs: (charset: "utf-8"))
   html.elem("meta", attrs: (name: "viewport", content: "width=device-width, initial-scale=1"))
-  let t = m.at("title", default: SITE.title)
-  html.elem("title")[#t]
+
+  // <title>: на главной — полное самоописательное название, на остальных
+  // страницах добавляем хвост «Recall · Максимастер», чтобы выдача и вкладка
+  // всегда называли проект и автора.
+  let page-title = m.at("title", default: SITE.title)
+  let title = if page-title == SITE.title { SITE.title-home } else {
+    page-title + " — " + SITE.title-suffix
+  }
+  let desc = m.at("summary", default: SITE.description)
+  html.elem("title")[#title]
+  html.elem("meta", attrs: (name: "description", content: desc))
+  html.elem("meta", attrs: (name: "author", content: SITE.author))
+  html.elem("link", attrs: (rel: "canonical", href: SITE.url))
+  og-tags(
+    title: title,
+    description: desc,
+    url: SITE.url,
+    type: "website",
+    site-name: SITE.author,
+    locale: "ru_RU",
+  )
+
   html.elem("link", attrs: (rel: "preconnect", href: "https://fonts.googleapis.com"))
   html.elem("link", attrs: (rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: ""))
   html.elem("link", attrs: (
@@ -27,18 +48,35 @@
   let title = meta.at("title", default: none)
   let active = meta.at("active", default: none)
 
-  // Keep the brand body purely inline. A real <img> is block-level in Typst's
-  // html model, which forces a <p> inside the <a> — invalid nesting the browser
-  // splits into two anchors, spreading logo and name apart. Render the logo as
-  // a CSS background on an inline span instead, so no paragraph is emitted.
+  // Brand block: logo links home, next to a two-line text column — the project
+  // name (links home) над строкой атрибуции «сделано в Максимастер», где имя
+  // ведёт на сайт студии. Атрибуция — отдельная ссылка, поэтому она НЕ может
+  // лежать внутри ссылки-названия (вложенные <a> невалидны) — отсюда колонка
+  // из двух самостоятельных якорей.
+  //
+  // Logo stays a CSS background on an inline span: a real <img> is block-level
+  // in Typst's html model and would force a <p>, breaking the layout.
+  let mark = html.elem("span", attrs: (
+    class: "brand-mark",
+    role: "img",
+    "aria-label": SITE.author,
+  ))
+  let brand-by = html.elem(
+    "span",
+    attrs: (class: "brand-by"),
+    [сделано в ]
+      + html.elem("a", attrs: (href: SITE.author-url, rel: "author"), [#SITE.author]),
+  )
   let brand = html.elem(
-    "a",
-    attrs: (href: u("/"), class: "brand"),
-    html.elem("span", attrs: (
-      class: "brand-mark",
-      role: "img",
-      "aria-label": "Максимастер",
-    )) + html.elem("span", attrs: (class: "brand-name"), [Recall]),
+    "div",
+    attrs: (class: "brand"),
+    html.elem("a", attrs: (href: u("/"), class: "brand-home", "aria-label": "Recall"), mark)
+      + html.elem(
+        "span",
+        attrs: (class: "brand-text"),
+        html.elem("a", attrs: (href: u("/"), class: "brand-name"), [Recall: задание для практики])
+          + brand-by,
+      ),
   )
 
   let nav = html.elem("nav", {
@@ -69,7 +107,10 @@
     #body
   ]
 
-  html.elem("footer", attrs: (class: "site-footer"))[
-    #SITE.tagline
-  ]
+  html.elem(
+    "footer",
+    attrs: (class: "site-footer"),
+    [#SITE.tagline · сделано в ]
+      + html.elem("a", attrs: (href: SITE.author-url, rel: "author"), [#SITE.author]),
+  )
 }

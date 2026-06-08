@@ -9,7 +9,7 @@
   --letter-bg: #fbf6f7;
   --card-bg: #ffffff;
   --header-bg: rgba(255, 255, 255, 0.85);
-  --max: 48rem;
+  --max: 54rem;
   font-family: "Montserrat", system-ui, sans-serif;
   line-height: 1.7;
 }
@@ -71,18 +71,53 @@ body {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  font-weight: 700;
-  font-size: 1.15rem;
-  color: var(--fg);
+  gap: 0.65rem;
+}
+
+.brand-home {
+  display: inline-flex;
+  flex-shrink: 0;
   text-decoration: none;
 }
 
 .brand-mark {
   display: inline-block;
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   background: url("../images/logo.svg") center / contain no-repeat;
+}
+
+/* Two-line text column: project name над строкой атрибуции. */
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brand-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.brand-name:hover {
+  color: var(--accent);
+}
+
+.brand-by {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.brand-by a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.brand-by a:hover {
+  color: var(--accent);
 }
 
 .site-header nav {
